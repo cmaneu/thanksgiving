@@ -17,3 +17,21 @@ These two benefits require quite an amount of paperwork and - for obvious reason
 
 This app is being built by a team of volunteers to "scratch their own itch". By building Thanksgiving, they also use it to showcase some technical updates around Azure and Microsoft stack.
 
+### Architecture 
+
+```mermaid
+graph LR
+    web(Web app) --> api
+    mobile(Mobile app) --> api
+    api(API) --> db(Database)
+    worker --> db
+    api --> storage(Storage)
+    worker --> storage
+```
+| Component | Technology used | location |
+|--------|------------|-------------|
+| Web app | Blazor Webassembly | |
+| Mobile app | .NET MAUI (standard) | |
+| API | .NET Minimal API + Entity Framework | |
+| Database | SQL Server | | 
+| Worker | .NET Worker  | |
