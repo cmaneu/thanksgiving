@@ -27,11 +27,13 @@ graph LR
     worker --> db
     api --> storage(Storage)
     worker --> storage
+    admincli(Admin CLI) --> db
 ```
-| Component | Technology used | location |
-|--------|------------|-------------|
-| Web app | Blazor Webassembly | |
-| Mobile app | .NET MAUI (standard) | |
-| API | .NET Minimal API + Entity Framework | |
-| Database | SQL Server | | 
-| Worker | .NET Worker  | |
+| Component | Technology used | 
+|--------|------------|
+| Web app | Blazor Webassembly |
+| Mobile app | .NET MAUI (standard) |
+| API | .NET Minimal API + Entity Framework |
+| Database | SQL Server |
+| Worker | .NET Worker  |
+| Admin CLI | .NET single-file executable Console app |
