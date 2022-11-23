@@ -1,0 +1,1 @@
+The Thanksgiving app logo is Heart by BomSymbols from <a href="https://thenounproject.com/browse/icons/term/heart/" target="_blank" title="Heart Icons">Noun Project</a>
