@@ -1,6 +1,17 @@
-# 🙏 Thanksgiving
+<div align="center">
+
+![](design/thanksgiving-text-logo.png)
+
 
 **Volunteers helps your non-profit in it's mission. Let's help you to _thanks_ them**.
+
+![GitHub](https://img.shields.io/github/license/cmaneu/thanksgiving)
+
+[Architecture](#architecture) •
+[Installation](#installation) •
+[Roadmap](#roadmap) 
+
+</div>
 
 ##  What is thanksgiving app? 🎁
 
@@ -37,3 +48,23 @@ graph LR
 | Database | SQL Server |
 | Worker | .NET Worker  |
 | Admin CLI | .NET single-file executable Console app |
+
+## Installation
+
+This section will be completed soon. A docker image and docker-compose files will be provided.
+
+## Support
+
+Support is community-based. See the [SUPPORT](SUPPORT.md) file for more information.
+
+## Roadmap
+
+You can see the [roadmap here](https://github.com/users/cmaneu/projects/4).
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
+## Project status
+
+This project is under heavy development. It's not ready for production yet.
