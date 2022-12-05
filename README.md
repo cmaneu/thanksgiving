@@ -6,6 +6,7 @@
 **Volunteers helps your non-profit in it's mission. Let's help you to _thanks_ them**.
 
 ![GitHub](https://img.shields.io/github/license/cmaneu/thanksgiving)
+![](https://img.shields.io/docker/v/cmaneu/thanksgiving/thanksgiving-api)
 
 [Architecture](#architecture) •
 [Installation](#installation) •
