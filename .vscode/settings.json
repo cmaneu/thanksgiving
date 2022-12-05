@@ -1,7 +1,8 @@
 {
     "conventionalCommits.scopes": [
         "marketing",
-        "db"
+        "db",
+        "api"
     ],
     "dataworkspace.excludedProjects": [
         "src/db/ThanksgivingDB/ThanksgivingDB.sqlproj"
