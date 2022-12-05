@@ -11,6 +11,8 @@ on:
     branches: [ "main" ]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
+    paths: 
+      - 'src/backend/**'
 
 env:
   # Use docker.io for Docker Hub if empty
