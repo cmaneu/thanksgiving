@@ -20,11 +20,11 @@ FROM build AS publish
 ENV BA=${APP_ARCH}
 RUN echo ${APP_ARCH}
 RUN echo $BA
-RUN dotnet publish  -p:PublishTrimmed=true --os linux --arch ${APP_ARCH} --self-contained true -p:PublishSingleFile=true "api.csproj" -c Release -o /app/publish
+RUN dotnet publish -p:PublishTrimmed=true --os linux --arch ${APP_ARCH} --self-contained -p:PublishSingleFile=true "api.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["api"]
+ENTRYPOINT ["./api"]
 
 
