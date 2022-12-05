@@ -14,7 +14,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+if(bool.Parse(builder.Configuration["DISABLE_HTTPS_REDIRECTION"]?.ToString() ?? "false") == true)
+{
+    app.Services.GetService<ILoggerFactory>().CreateLogger("API Host").LogInformation("Disabling HTTPS Redirection");
+    app.UseHttpsRedirection();
+}
+
 
 var summaries = new[]
 {
