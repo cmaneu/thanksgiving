@@ -1,28 +1,22 @@
 #See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
-#amd64+x64 or arm64v8+linux-arm64
-ARG IMAGE_ARCH=amd64 
 
-FROM mcr.microsoft.com/dotnet/nightly/runtime-deps:7.0-jammy-chiseled-${IMAGE_ARCH} AS base
+FROM mcr.microsoft.com/dotnet/nightly/aspnet:7.0-jammy AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
-WORKDIR /src
-COPY ["backend/api/api.csproj", "backend/api/"]
+WORKDIR /srcd
+COPY ["./src/backend/api/api.csproj", "backend/api/"]
 RUN dotnet restore "backend/api/api.csproj"
 COPY . .
 WORKDIR "/src/backend/api"
 RUN dotnet build "api.csproj" -c Release -o /app/build
 
-ARG APP_ARCH=x64
 FROM build AS publish
-ENV BA=${APP_ARCH}
-RUN echo ${APP_ARCH}
-RUN echo $BA
-RUN dotnet publish --os linux --arch ${APP_ARCH} --self-contained true -p:PublishSingleFile=true "api.csproj" -c Release -o /app/publish
+RUN dotnet publish --os linux --arch x64 -p:PublishProfile=DefaultContainer  "api.csproj" -c Release -o /app/publish /p:UseAppHost=true
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["api"]
+ENTRYPOINT ["dotnet","api.dll"]

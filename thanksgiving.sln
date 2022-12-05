@@ -7,7 +7,7 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "ThanksgivingDB", "src\db\Th
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backend", "Backend", "{AB6BC097-1C1F-4E21-A8D0-C41E1F5E810E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "api", "backend\api\api.csproj", "{CC999747-4DC8-4205-A0D9-84CC5DAF536C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "api", "src\backend\api\api.csproj", "{CC999747-4DC8-4205-A0D9-84CC5DAF536C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
