@@ -4,6 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -19,6 +20,10 @@ if(bool.Parse(builder.Configuration["DISABLE_HTTPS_REDIRECTION"]?.ToString() ?? 
     app.Services.GetService<ILoggerFactory>().CreateLogger("API Host").LogInformation("Disabling HTTPS Redirection");
     app.UseHttpsRedirection();
 }
+
+// https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-7.0
+app.MapHealthChecks("/.core/healthcheck");
+
 
 
 var summaries = new[]
