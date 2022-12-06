@@ -1,5 +1,6 @@
 ﻿//#define ATTACH_DEBUGGER
 using Spectre.Console;
+using System.ComponentModel;
 using System.Diagnostics;
 using thanks_dev.Commands;
 
@@ -26,3 +27,12 @@ app.Configure(config =>
 });
 
 return app.Run(args);
+
+
+
+class DefaultCommandSettings : CommandSettings
+{
+    [CommandOption("--verbose")]
+    [DefaultValue(false)]
+    public bool? Verbose { get; set; }
+}
