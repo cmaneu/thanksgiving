@@ -1,9 +1,39 @@
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Version = "v1",
+        Title = "Thanksgiving app API",
+        Description = "The backend API for Thanksgiving app",
+        TermsOfService = new Uri("https://github.com/cmaneu/thanksgiving"),
+        Contact = new OpenApiContact
+        {
+            Name = "GitHub discussions",
+            Url = new Uri("https://github.com/cmaneu/thanksgiving/discussions")
+        },
+        License = new OpenApiLicense
+        {
+            Name = "MIT",
+            Url = new Uri("https://github.com/cmaneu/thanksgiving/blob/main/LICENSE")
+        }
+    });
+
+    options.InferSecuritySchemes();
+    options.AddServer(new Microsoft.OpenApi.Models.OpenApiServer() { Url = "http://localhost:5029", Description = "Localhost unsecure" });
+    options.AddServer(new Microsoft.OpenApi.Models.OpenApiServer() { Url = "https://localhost:7294", Description = "Localhost HTTPS" });
+    options.AddServer(new Microsoft.OpenApi.Models.OpenApiServer() { Url = "http://localhost:8080", Description = "Localhost Docker" });
+});
+
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();
