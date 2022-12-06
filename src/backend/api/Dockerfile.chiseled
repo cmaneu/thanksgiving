@@ -1,4 +1,3 @@
-#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
 #amd64+x64 or arm64v8+linux-arm64
 ARG IMAGE_ARCH=amd64 
 
@@ -15,14 +14,34 @@ COPY . .
 WORKDIR "/src/src/backend/api"
 RUN dotnet build "api.csproj" -c Release -o /app/build
 
-ARG APP_ARCH=x64
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build-cli
+WORKDIR /src
+COPY ["src/backend/thanks-dev/thanks-dev.csproj", "backend/thanks-dev/"]
+RUN dotnet restore "backend/thanks-dev/thanks-dev.csproj"
+COPY . .
+WORKDIR "/src/src/backend/thanks-dev"
+RUN dotnet build "thanks-dev.csproj" -c Release -o /app/build
+
+
 FROM build AS publish
+ARG APP_ARCH=x64
+ARG IMAGE_ARCH
 ENV BA=${APP_ARCH}
 RUN echo ${APP_ARCH}
 RUN echo $BA
 RUN dotnet publish --os linux --arch ${APP_ARCH} "api.csproj" -c Release -o /app/publish
 
+FROM build-cli AS publish-cli
+ARG APP_ARCH
+ARG IMAGE_ARCH
+
+RUN dotnet publish --os linux --arch ${APP_ARCH} "thanks-dev.csproj" -c Release -p:PublishSingleFile=true -o /app/publish-cli
+
 FROM base AS final
+WORKDIR /app-cli
+COPY --from=publish-cli /app/publish-cli .
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+HEALTHCHECK --start-period=10s --interval=1m --timeout=6s CMD ["/app-cli/thanks-dev","api","health","http://localhost"]
 ENTRYPOINT ["dotnet","api.dll"]
