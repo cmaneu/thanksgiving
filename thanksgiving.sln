@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "api", "src\backend\api\api.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{2531D43A-94C1-4FA6-8BD5-31A291B6DAD0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Thanksgiving.API.Test", "src\test\Thanksgiving.API.Test\Thanksgiving.API.Test.csproj", "{9E84E8A8-79D8-4D4B-8315-D6C3FBA42DA7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thanksgiving.API.Test", "src\test\Thanksgiving.API.Test\Thanksgiving.API.Test.csproj", "{9E84E8A8-79D8-4D4B-8315-D6C3FBA42DA7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "thanks-dev", "src\backend\thanks-dev\thanks-dev.csproj", "{26CA28E0-0B90-40AF-8F9A-DB701A0E978E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +33,10 @@ Global
 		{9E84E8A8-79D8-4D4B-8315-D6C3FBA42DA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9E84E8A8-79D8-4D4B-8315-D6C3FBA42DA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9E84E8A8-79D8-4D4B-8315-D6C3FBA42DA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26CA28E0-0B90-40AF-8F9A-DB701A0E978E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26CA28E0-0B90-40AF-8F9A-DB701A0E978E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26CA28E0-0B90-40AF-8F9A-DB701A0E978E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26CA28E0-0B90-40AF-8F9A-DB701A0E978E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -39,6 +45,7 @@ Global
 		{9A6C4EAE-82A4-4EF4-911A-3546FDA35EA8} = {AB6BC097-1C1F-4E21-A8D0-C41E1F5E810E}
 		{CC999747-4DC8-4205-A0D9-84CC5DAF536C} = {AB6BC097-1C1F-4E21-A8D0-C41E1F5E810E}
 		{9E84E8A8-79D8-4D4B-8315-D6C3FBA42DA7} = {2531D43A-94C1-4FA6-8BD5-31A291B6DAD0}
+		{26CA28E0-0B90-40AF-8F9A-DB701A0E978E} = {AB6BC097-1C1F-4E21-A8D0-C41E1F5E810E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F969AB6A-E5D6-4A20-8AD5-07F45B1D7973}
