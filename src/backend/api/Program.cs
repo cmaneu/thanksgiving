@@ -1,3 +1,4 @@
+using Microsoft.FeatureManagement;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -38,6 +39,7 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddHealthChecks();
 
+builder.Services.AddFeatureManagement();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
