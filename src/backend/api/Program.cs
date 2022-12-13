@@ -1,6 +1,15 @@
+// TODO: Proper rename async methods
+using api.Adapters;
+using api.Endpoints;
+using api.Services;
+using api.Services.Auth;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.FeatureManagement;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +19,7 @@ builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
+builder.Services.AddLogging();
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -38,8 +48,38 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.AddHealthChecks();
-
 builder.Services.AddFeatureManagement();
+
+
+builder.Services.AddAuthentication(config =>
+{
+    config.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    config.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(config =>
+{
+    config.RequireHttpsMetadata = false;
+    config.SaveToken = true;
+    config.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection(nameof(AuthTokenSettings))["JwtSigningKey"])),
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration.GetSection(nameof(AuthTokenSettings))["DefaultIssuer"],
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration.GetSection(nameof(AuthTokenSettings))["APIAudience"],
+    };
+});
+
+builder.Services.AddAuthorizationBuilder().AddCurrentUserHandler();
+
+builder.Services.AddCurrentUser();
+
+builder.Services.AddScoped<AuthorizationService>();
+builder.Services.AddSingleton<ITokenService, TokenService>();
+builder.Services.AddSingleton<IAuthenticationTokenStore, InMemoryAuthenticationTokenStore>();
+
+builder.Services.AddScoped<IUserRepository, FakeUserRepository>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -58,31 +98,13 @@ if(bool.Parse(builder.Configuration["THANKS_DISABLE_HTTPS_REDIRECTION"]?.ToStrin
 // https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-7.0
 app.MapHealthChecks("/.core/healthcheck");
 
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapAuthEndpoints();
 
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+app.MapGet("/me", (CurrentIdentity id) => new { id.User.FirstName }).RequireAuthorization();
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
 
 app.Run();
-
-internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
