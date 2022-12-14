@@ -4,6 +4,7 @@ using api.Endpoints;
 using api.Services;
 using api.Services.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.FeatureManagement;
 using Microsoft.IdentityModel.Tokens;
@@ -50,6 +51,11 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddHealthChecks();
 builder.Services.AddFeatureManagement();
 
+builder.Services.AddDbContext<ThanksDBContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration["THANKS_DB_CONNECTION"]);
+}
+);
 
 builder.Services.AddAuthentication(config =>
 {
@@ -79,6 +85,14 @@ builder.Services.AddSingleton<ITokenService, TokenService>();
 builder.Services.AddSingleton<IAuthenticationTokenStore, InMemoryAuthenticationTokenStore>();
 
 builder.Services.AddScoped<IUserRepository, FakeUserRepository>();
+builder.Services.AddScoped<OrganizationService>();
+builder.Services.AddScoped<IOrganizationRepository, EFOrganizationRepositoryAdapter>();
+
+builder.Services.AddOutputCache(options =>
+{
+    options.AddBasePolicy(builder => builder.Expire(TimeSpan.FromSeconds(15)));
+    //options.AddPolicy("Expire30", builder => builder.Expire(TimeSpan.FromSeconds(30)));
+});
 
 var app = builder.Build();
 
@@ -101,10 +115,13 @@ app.MapHealthChecks("/.core/healthcheck");
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapAuthEndpoints();
+app.UseOutputCache();
 
+app.MapAuthEndpoints();
+app.MapOrganizationActivityEndpoints();
 
 app.MapGet("/me", (CurrentIdentity id) => new { id.User.FirstName }).RequireAuthorization();
 
+app.MapGet("/organizations", async (OrganizationService orgService) => { return await orgService.GetAllPublicOrganizationsAsync(); }).CacheOutput();
 
 app.Run();
