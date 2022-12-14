@@ -1,6 +1,0 @@
-﻿CREATE TABLE [dbo].[Organization]
-(
-  [Id] INT NOT NULL PRIMARY KEY IDENTITY,
-  [Slug] NVARCHAR(50) NOT NULL,
-  [Name] NVARCHAR(80) NOT NULL
-)
