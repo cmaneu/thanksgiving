@@ -1,0 +1,114 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":null,"items":[{"name":"csharp","languageName":"C#","aliases":["c#","cs"]},{"name":"fsharp","languageName":"F#","aliases":["f#","fs"]},{"name":"pwsh","languageName":"PowerShell","aliases":["powershell"]},{"name":"javascript","languageName":"JavaScript","aliases":["js"]},{"name":"html","languageName":"HTML"},{"name":"sql","languageName":"SQL"},{"name":"kql","languageName":"KQL"},{"name":"mermaid","languageName":"Mermaid"},{"name":"httpRequest","languageName":"http"},{"name":"value"}]}}
+
+#!markdown
+
+# Thanksgiving - Fake data generation
+
+<img style="width:300px" src="https://github.com/cmaneu/thanksgiving/raw/main/design/thanksgiving-text-logo.png" />
+<img style="width:300px" src="https://thanksgappchmadevfr.z28.web.core.windows.net/thanksgiving-logo-01.svg" />
+
+This notebook will create fake data for the Thanksgiving DB.
+
+It'll generate: 
+
+- Few default organizations with their activities and settings
+- Some fake users
+- Some fake activities
+
+#!csharp
+
+#r "nuget:Microsoft.DotNet.Interactive.SqlServer,*-*"
+#r "nuget: Bogus"
+using System.Linq;
+using Bogus;
+
+#!csharp
+
+#!about
+
+#!csharp
+
+#!connect mssql --create-dbcontext --kernel-name ThanksDB "Data Source=tcp:localhost,1433;Initial Catalog=ThanksDB;Integrated Security=False;User Id=sa;Password=c149482d-be4a-40c4-a04d-292980a9a076;Encrypt=True;TrustServerCertificate=True;MultipleActiveResultSets=True""
+
+#!csharp
+
+ThanksDB.Organizations.Add(new Organization { Name = "Microsoft Philantropy", Slug = "microsoft-philantropy", Visibility = 3 });
+ThanksDB.Organizations.Add(new Organization { Name = "Surfrider Foundation Europe", Slug = "surfrider", Visibility = 3 });
+ThanksDB.Organizations.Add(new Organization { Name = "Scubabous", Slug = "scubabous", Visibility = 2 });
+ThanksDB.SaveChanges();
+
+ThanksDB.Organizations.Display();
+
+#!sql-ThanksDB
+SELECT * FROM dbo.Organizations
+
+#!markdown
+
+## Variable sharing
+We can share variables from one C# cell to a SQL cell. Let's see how it works.
+
+#!csharp
+
+var surfriderOrg = ThanksDB.Organizations.FirstOrDefault(o => o.Slug == "surfrider");
+var surfriderOrgId = surfriderOrg.Id;
+
+surfriderOrg.OrganizationActivities.Add(new OrganizationActivity { Name = "Beach clean up" });
+surfriderOrg.OrganizationActivities.Add(new OrganizationActivity { Name = "School ocean Discovery - 1h" });
+ThanksDB.SaveChanges();
+
+#!csharp
+
+#!sql-ThanksDB
+
+#!share --from csharp surfriderOrgId
+SELECT TOP 1 * FROM dbo.Organizations WHERE Id = @surfriderOrgId
+SELECT  * FROM dbo.OrganizationActivities WHERE OrganizationId = @surfriderOrgId
+
+#!markdown
+
+## Create fake users
+
+#!csharp
+
+// Create a new faker for User, and then creat 100 users and save them to the database with Entity Framework Core
+var userFaker = new Faker<User>("fr")
+.RuleFor(u => u.FirstName, f => f.Name.FirstName())
+.RuleFor(u => u.LastName, f => f.Name.LastName())
+.RuleFor(u => u.Email, (f,u) => f.Internet.Email(u.FirstName, u.LastName));
+
+
+ThanksDB.Users.AddRange(userFaker.Generate(10000));
+ThanksDB.SaveChanges();
+
+#!sql-ThanksDB
+SELECT COUNT(*) FROM dbo.[Users]
+SELECT TOP 10 * FROM dbo.[Users]
+
+#!csharp
+
+// Attach 10 random fake users to Surfrider
+var randomUsers = ThanksDB.Users.OrderBy(u => Guid.NewGuid());
+var surfriderUsers = randomUsers.Take(20).Select( su => new OrganizationMembership { OrganizationId = surfriderOrgId, UserId = su.Id, Role = 1 });
+var surfriderAdmins = randomUsers.Take(10).Select( su => new OrganizationMembership { OrganizationId = surfriderOrgId, UserId = su.Id, Role = 2 });
+var surfriderOwners = randomUsers.Take(2).Select( su => new OrganizationMembership { OrganizationId = surfriderOrgId, UserId = su.Id, Role = 3 });
+ThanksDB.OrganizationMemberships.AddRange(surfriderUsers);
+ThanksDB.OrganizationMemberships.AddRange(surfriderAdmins);
+ThanksDB.OrganizationMemberships.AddRange(surfriderOwners);
+ThanksDB.SaveChanges();
+
+#!sql-ThanksDB
+SELECT 
+    u.FirstName,
+    u.LastName,
+    u.Email,
+    CASE m.Role
+        WHEN 1 THEN 'Member'
+        WHEN 2 THEN 'Admin'
+        WHEN 3 THEN 'Owner'
+    END as Role 
+FROM dbo.OrganizationMemberships AS m
+JOIN dbo.Users AS u ON m.UserId = u.Id
+WHERE OrganizationId = @surfriderOrgId
+ORDER BY m.Role DESC
