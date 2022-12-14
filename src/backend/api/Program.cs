@@ -87,6 +87,7 @@ builder.Services.AddSingleton<IAuthenticationTokenStore, InMemoryAuthenticationT
 builder.Services.AddScoped<IUserRepository, FakeUserRepository>();
 builder.Services.AddScoped<OrganizationService>();
 builder.Services.AddScoped<IOrganizationRepository, EFOrganizationRepositoryAdapter>();
+builder.Services.AddScoped<ActivityExportService>();
 
 builder.Services.AddOutputCache(options =>
 {
@@ -121,6 +122,8 @@ app.MapAuthEndpoints();
 app.MapOrganizationActivityEndpoints();
 
 app.MapGet("/me", (CurrentIdentity id) => new { id.User.FirstName }).RequireAuthorization();
+app.MapGet("/me/{userId}/exportActivities", async (int userId, ActivityExportService exportService) => 
+    Results.Stream(await exportService.ExportUserActivitesAsTar(userId), "application/tar",$"export-{DateTime.Now:yyyy-MM-dd}.tar"));
 
 app.MapGet("/organizations", async (OrganizationService orgService) => { return await orgService.GetAllPublicOrganizationsAsync(); }).CacheOutput();
 
