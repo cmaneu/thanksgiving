@@ -6,15 +6,15 @@ EXPOSE 80
 EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
-WORKDIR /srcd
+WORKDIR /src
 COPY ["./src/backend/api/api.csproj", "backend/api/"]
 RUN dotnet restore "backend/api/api.csproj"
 COPY . .
-WORKDIR "/src/backend/api"
+WORKDIR "/src/src/backend/api"
 RUN dotnet build "api.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish --os linux --arch x64 -p:PublishProfile=DefaultContainer  "api.csproj" -c Release -o /app/publish /p:UseAppHost=true
+RUN dotnet publish "api.csproj" -c Release -o /app/publish /p:UseAppHost=true
 
 FROM base AS final
 WORKDIR /app
