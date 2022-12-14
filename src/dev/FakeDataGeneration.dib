@@ -35,11 +35,11 @@ using Bogus;
 #!sql-ThanksDB
 
 DELETE FROM dbo.Activities;
---DELETE FROM dbo.OrganizationActivities;
---DELETE FROM dbo.OrganizationLocation;
---DELETE FROM dbo.OrganizationMemberships;
---DELETE FROM dbo.Users;
---DELETE FROM dbo.Organizations;
+DELETE FROM dbo.OrganizationActivities;
+DELETE FROM dbo.OrganizationLocation;
+DELETE FROM dbo.OrganizationMemberships;
+DELETE FROM dbo.Users;
+DELETE FROM dbo.Organizations;
 
 #!csharp
 
@@ -52,6 +52,14 @@ ThanksDB.Organizations.Display();
 
 #!sql-ThanksDB
 SELECT * FROM dbo.Organizations
+
+#!csharp
+
+ThanksDB.Organizations.Add(new Organization { Name = "Red Cross France", Slug = "croix-rouge-fr", Visibility = 3 });
+ThanksDB.SaveChanges();
+
+#!sql-ThanksDB
+SELECT * FROM dbo.Organizations WHERE Visibility = 3
 
 #!markdown
 
@@ -148,3 +156,11 @@ activities.Display();
 
 ThanksDB.Activities.AddRange(activities);
 ThanksDB.SaveChanges();
+
+#!sql-ThanksDB
+
+SELECT *,    CASE Status
+        WHEN 1 THEN 'Submitted'
+        WHEN 2 THEN 'Approved'
+        WHEN 3 THEN 'Rejected'
+    END as Role  FROM dbo.Activities WHERE VolunteerId = 31975
