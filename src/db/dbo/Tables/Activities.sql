@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[Activities]
 (
-	[Id] INT NOT NULL PRIMARY KEY,
+	[Id] INT NOT NULL IDENTITY (1, 1) PRIMARY KEY,
 	[OrganizationId] INT NOT NULL,
 	[VolunteerId] INT NOT NULL,
 	[Name] NVARCHAR(100) NOT NULL,

@@ -32,6 +32,15 @@ using Bogus;
 
 #!connect mssql --create-dbcontext --kernel-name ThanksDB "Data Source=tcp:localhost,1433;Initial Catalog=ThanksDB;Integrated Security=False;User Id=sa;Password=c149482d-be4a-40c4-a04d-292980a9a076;Encrypt=True;TrustServerCertificate=True;MultipleActiveResultSets=True""
 
+#!sql-ThanksDB
+
+DELETE FROM dbo.Activities;
+--DELETE FROM dbo.OrganizationActivities;
+--DELETE FROM dbo.OrganizationLocation;
+--DELETE FROM dbo.OrganizationMemberships;
+--DELETE FROM dbo.Users;
+--DELETE FROM dbo.Organizations;
+
 #!csharp
 
 ThanksDB.Organizations.Add(new Organization { Name = "Microsoft Philantropy", Slug = "microsoft-philantropy", Visibility = 3 });
@@ -112,3 +121,30 @@ FROM dbo.OrganizationMemberships AS m
 JOIN dbo.Users AS u ON m.UserId = u.Id
 WHERE OrganizationId = @surfriderOrgId
 ORDER BY m.Role DESC
+
+#!markdown
+
+## Create fake activities
+
+#!csharp
+
+var ourUser = randomUsers.Take(1).First();
+ourUser.Display();
+var numberOfActivitiesToGenerate = 20;
+var startDate = DateTime.Now.AddMonths(-6);
+
+var activityList = surfriderOrg.OrganizationActivities.Select(a => a.Name).ToList();
+
+
+var activityFaker = new Faker<Activity>("fr")
+    .RuleFor(a => a.Name, f => f.PickRandom(activityList))
+    .RuleFor(a => a.Date, f => f.Date.Between(startDate, DateTime.Now))
+    .RuleFor(a => a.VolunteerId, f => ourUser.Id)
+    .RuleFor(a => a.OrganizationId, f => surfriderOrgId)
+    .RuleFor(a => a.Duration, f=> f.Random.Int(60, 180));
+
+var activities = activityFaker.Generate(numberOfActivitiesToGenerate);
+activities.Display();
+
+ThanksDB.Activities.AddRange(activities);
+ThanksDB.SaveChanges();
